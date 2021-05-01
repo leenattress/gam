@@ -10,6 +10,7 @@ class Cast {
     actor.init();
     actor.key = actorConfig.id || Utils.uuidv4();
     this.actors[actor.key] = actor;
+    return actor.key;
   }
 
   destroyActor(actor) {
@@ -33,6 +34,14 @@ class Cast {
     if (this.actors) {
       for (const [key, actor] of Object.entries(this.actors)) {
         actor.update();
+      }
+    }
+  }
+
+  drawActors() {
+    if (this.actors) {
+      for (const [key, actor] of Object.entries(this.actors)) {
+        actor.draw();
       }
     }
   }

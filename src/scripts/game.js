@@ -4,19 +4,41 @@ import { Utils } from "./utils";
 
 class Game {
 
-  constructor({ fill, target, width, height, onFrame }) {
+  constructor({ fill, target, width, height, onFrame, onMouseClick, onMouseMove }) {
     this.fps = 0;
     this.fill = fill;
     this.width = width;
     this.height = height;
     this.debug = true;
     this.oldTimeStamp = 10;
+
     this.canvas = document.getElementById(target);
     this.canvas.width = this.width;
     this.canvas.height = this.height;
     this.context = canvas.getContext("2d");
+    this.canvas.addEventListener('mousedown', (event) => {
+      if (typeof onMouseClick === 'function')
+        onMouseClick(this.canvasMousePosition(event));
+    });
+    this.canvas.addEventListener('mousemove', (event) => {
+      if (typeof onMouseMove === 'function')
+        onMouseMove(this.canvasMousePosition(event));
+    });    
+
+    // no right click context on the canvas please
+    this.canvas.addEventListener("contextmenu", function(e){
+      e.preventDefault();
+    }, false);
+
     this.frame = onFrame;
     window.requestAnimationFrame((ts) => this.draw(ts));
+  }
+
+  canvasMousePosition(event) {
+    const rect = this.canvas.getBoundingClientRect();
+    const x = event.clientX - rect.left;
+    const y = event.clientY - rect.top;
+    return { x, y, button: event.button };
   }
 
   drawRectFill(color, x1, y1, x2, y2) {

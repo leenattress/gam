@@ -16,11 +16,22 @@ function vector(angle, length) {
 }
 function ld_x(len, dir) { return Math.cos(dir) * len; }
 function ld_y(len, dir) { return Math.sin(dir) * len; }
-function point_ang(cx, cy, ex, ey) { Math.atan2(cx - ex, cy - ey); }
-function point_dist(x1, y1, x2, y2) {
+function pointAngle(cx, cy, ex, ey) { Math.atan2(cx - ex, cy - ey); }
+function pointDistance(x1, y1, x2, y2) {
   x3 = Math.abs(x2 - x1);
   y3 = Math.abs(y2 - y1);
   return Math.sqrt((x3 * x3) + (y3 * y3));
+}
+function degreesToRadians(degrees) {
+  return degrees * Math.PI / 180;
+}
+
+function radiansToDegrees(radians) {
+  return radians * (180/Math.PI);
+}
+
+function reflectDegrees(incidenceAngle, wallAngle) {       
+  return radiansToDegrees((2 * degreesToRadians(wallAngle)) - degreesToRadians(incidenceAngle));  
 }
 
 const Utils = {
@@ -28,9 +39,12 @@ const Utils = {
   getRandomInt,
   ld_x,
   ld_y,
-  point_ang,
-  point_dist,
-  vector
+  pointAngle,
+  pointDistance,
+  vector,
+  degreesToRadians,
+  radiansToDegrees,
+  reflectDegrees
 };
 
 export { Utils };
