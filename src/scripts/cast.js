@@ -5,6 +5,12 @@ class Cast {
     this.actors = {};
   }
 
+  getActor(actorId) {
+    if (this.actors[actorId]) {
+      return this.actors[actorId];
+    }
+  }
+
   addActor(actorConfig) {
     const actor = new Actor(actorConfig);
     actor.init();

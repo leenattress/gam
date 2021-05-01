@@ -13,6 +13,16 @@ const config = {
 
 const cast = new Cast();
 
+const mouseFollower = cast.addActor({
+  onUpdate: function () {
+    stage.drawRectFill(`rgba(255, 0, 255, 1)`, this.x - 15, this.y - 15, 30, 30);
+    stage.drawText(`x: ${Math.floor(this.x)}`, this.x + 20, this.y-5);
+    stage.drawText(`y: ${Math.floor(this.y)}`, this.x + 20, this.y+10);
+           
+  }
+});
+
+
 const stage = new Game({
   target: 'canvas',
   width: config.width,
@@ -33,9 +43,10 @@ const stage = new Game({
       cast.destroyAllActors();
     }
   },
-  // onMouseMove: (event) => {
-  //   console.log(event);
-  // }
+  onMouseMove: (event) => {
+    cast.getActor(mouseFollower).x = event.x;
+    cast.getActor(mouseFollower).y = event.y;
+  }
 });
 
 const makeSmallParticle = (x, y) => {
@@ -53,7 +64,7 @@ const makeSmallParticle = (x, y) => {
       this.vy = vector[1];
       this.move();
       if (this.time > 30) { cast.destroyActorById(this.key); }
-      stage.drawCircleFill(`rgba(0, 0, 255, 0.5`, this.x, this.y, Math.max(0.1, this.speed));
+      stage.drawCircleFill(`rgba(0, 0, 255, 0.5)`, this.x, this.y, Math.max(0.1, this.speed));
     }
   });
 };

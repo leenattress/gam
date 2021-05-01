@@ -1,10 +1,9 @@
 class Actor {
   constructor({
     group = 'default',
-    onInit,
-    onUpdate,
-    onDraw,
-    onDestroy
+    onInit = () => {},
+    onUpdate = () => {},
+    onDestroy = () => {}
   }) {
 
     this.time = 0;
@@ -21,7 +20,6 @@ class Actor {
 
     this.init = onInit;
     this.update = onUpdate;
-    this.draw = onDraw;
     this.destroy = onDestroy;
 
     this.init();
