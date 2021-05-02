@@ -1,5 +1,5 @@
 import "../styles/index.scss";
-import { Game, Cast, Utils } from './game';
+import { Stage, Cast, Utils } from './game';
 import { easeOutCubic } from './tween';
 
 if (process.env.NODE_ENV === "development") {
@@ -8,44 +8,43 @@ if (process.env.NODE_ENV === "development") {
 
 const config = {
   width: 800,
-  height: 600
+  height: 480
 };
 
 const cast = new Cast();
 
-const mouseFollower = cast.addActor({
-  onUpdate: function () {
-    stage.drawRectFill(`rgba(255, 0, 255, 1)`, this.x - 15, this.y - 15, 30, 30);
-    stage.drawText(`x: ${Math.floor(this.x)}`, this.x + 20, this.y-5);
-    stage.drawText(`y: ${Math.floor(this.y)}`, this.x + 20, this.y+10);
-           
-  }
-});
-
-
-const stage = new Game({
+const stage = new Stage({
   target: 'canvas',
   width: config.width,
   height: config.height,
-  fill: '#f0f0f0',
   onFrame: () => {
     cast.updateActors();
-    stage.drawText('Actors: ' + Object.keys(cast.actors).length, 20, 20);
   },
   onMouseClick: (event) => {
     if (event.button === 0) {
-      makeBouncyActorHere(event.x, event.y, 20);
-      var i;
+      let i;
       for (i = 0; i < (Utils.getRandomInt(5) + 5); i++) {
-        makeSmallParticle(event.x, event.y);
+        makeBouncyActorHere(event.x, event.y, 20);
       };
     } else {
       cast.destroyAllActors();
     }
   },
   onMouseMove: (event) => {
-    cast.getActor(mouseFollower).x = event.x;
-    cast.getActor(mouseFollower).y = event.y;
+    let mouseFollow = cast.getActor(mouseFollower);
+    if (mouseFollow) {
+      mouseFollow.x = event.x;
+      mouseFollow.y = event.y;
+    }
+    makeSmallParticle(event.x, event.y);
+  }
+});
+
+const mouseFollower = cast.addActor({
+  onUpdate: function () {
+    let rectangleColor = [0.2, 1.0, 0.5, 0.8];
+    stage.drawRectFill(rectangleColor, this.x - 15, this.y - 15, 30, 30);
+    //stage.drawRectFill(rectangleColor, 200, 200, 80, 80);
   }
 });
 
@@ -64,7 +63,11 @@ const makeSmallParticle = (x, y) => {
       this.vy = vector[1];
       this.move();
       if (this.time > 30) { cast.destroyActorById(this.key); }
-      stage.drawCircleFill(`rgba(0, 0, 255, 0.5)`, this.x, this.y, Math.max(0.1, this.speed));
+
+      let rectangleColor = [0.2, 0.2, 1, 0.8];
+      let half = this.speed / 2;
+      let size = Math.max(1, this.speed);
+      stage.drawRectFill(rectangleColor, this.x - half, this.y - half, size, size);
     }
   });
 };
@@ -78,9 +81,10 @@ const makeBouncyActorHere = (x, y, size) => {
     },
     onUpdate: function () {
 
+      let life = 240;
       this.tick();
 
-      this.speed = easeOutCubic(this.time, 20, 0, 240);
+      this.speed = easeOutCubic(this.time, 20, 0, life);
 
       const vector = Utils.vector(this.angle, this.speed);
       this.vx = vector[0];
@@ -99,10 +103,10 @@ const makeBouncyActorHere = (x, y, size) => {
         cast.destroyActorById(this.key);
       }
 
-      //stage.drawRectFill('#f00000', this.x, this.y, 20, 20);
-      stage.drawCircleFill(`rgba(255, 0, 0, ${this.speed / 4})`, this.x, this.y, size);
-      // stage.drawText(`${Math.floor(this.x)}/${Math.floor(this.y)} - t:${this.time}`, this.x, this.y - 10);        
-
+      let alpha = (this.speed / 100) * life;
+      let rectangleColor = [1, 0.2, 0.1, alpha];
+      let half = size / 2;
+      stage.drawRectFill(rectangleColor, this.x - half, this.y - half, size, size);
     },
     onDestroy: function () {
       this.active = false;

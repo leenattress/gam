@@ -23,6 +23,10 @@ module.exports = merge(common, {
       files: Path.join('src', '**/*.s?(a|c)ss'),
     }),
   ],
+  watch: true,
+  watchOptions: {
+    ignored: '/node_modules/',
+  },  
   module: {
     rules: [
       {
