@@ -2,6 +2,7 @@ const Path = require('path');
 const Webpack = require('webpack');
 const { merge } = require('webpack-merge');
 const StylelintPlugin = require('stylelint-webpack-plugin');
+const CopyPlugin = require("copy-webpack-plugin");
 
 const common = require('./webpack.common.js');
 
@@ -16,6 +17,11 @@ module.exports = merge(common, {
     hot: true,
   },
   plugins: [
+    new CopyPlugin({
+      patterns: [
+        { from: "src/sounds", to: "sounds" }
+      ],
+    }),    
     new Webpack.DefinePlugin({
       'process.env.NODE_ENV': JSON.stringify('development'),
     }),

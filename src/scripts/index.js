@@ -1,5 +1,5 @@
 import "../styles/index.scss";
-import { Stage, Cast, Utils, Gamepad, Tweens } from './engine';
+import { Stage, Cast, Utils, Gamepad, Tweens, Audio } from './engine';
 
 if (process.env.NODE_ENV === "development") {
   require("../index.html");
@@ -8,10 +8,14 @@ if (process.env.NODE_ENV === "development") {
 const debug = document.getElementById('debug');
 
 const cast = new Cast();
+const audio = new Audio();
+audio.add('pew', '/sounds/pew.wav');
+audio.add('bounce', '/sounds/bounce.wav');
+audio.add('splode', '/sounds/splode.wav');
 
 const config = {
-  width: 1280,
-  height: 720
+  width: 800,
+  height: 480
 };
 
 const gamepad = new Gamepad();
@@ -46,7 +50,7 @@ gamepad.on('press', 'button_1', e => {
   if (joyPadFollower) {
     const { x, y } = cast.getActor(joyPadFollower);
     makeShootyBullet(x, y);
-    console.log(joyPadFollower);
+    audio.play('pew');
   }
 });
 gamepad.on('hold', 'stick_axis_left', e => {
@@ -77,6 +81,7 @@ function frame() {
   debug.innerHTML = JSON.stringify({
     config,
     actors: Object.keys(cast.actors).length,
+    audio: audio,
     gamepad: gamepad._events,
   }, null, 2);
 };
@@ -86,17 +91,17 @@ function mouseClick(event) {
     Utils.times(Utils.getRandomInt(5) + 5)(i => {
       makeBouncyActorHere(event.x, event.y, 20);
     });
+    audio.play('pew');
   } else {
     cast.destroyAllActors();
   }
 }
 
 function mouseMove(event) {
-  let mouseFollow = cast.getActor(mouseFollower);
-  if (mouseFollow) {
-    mouseFollow.x = event.x;
-    mouseFollow.y = event.y;
-  }
+
+  cast.getActor(mouseFollower)
+  .setPosition(event.x, event.y);
+
   makeSmallParticle(event.x, event.y);
 }
 
@@ -111,12 +116,15 @@ const mouseFollower = cast.addActor({
 const makeShootyBullet = (x, y) => {
   return cast.addActor({
     onInit: function () {
+
       this
         .setPosition(x + 40, y)
         .right(10)
         .destroyIn(120);
+
     },
     onUpdate: function () {
+
       this
         .tick()
         .checkShouldDestroy()
@@ -161,7 +169,6 @@ const makeSmallParticle = (x, y) => {
         .destroyIn(30);
     },
     onUpdate: function () {
-
       this
         .tick()
         .setSpeed(Tweens.easeOutCubic(this.time, Utils.getRandomInt(16), 0, 60))
@@ -178,36 +185,40 @@ const makeSmallParticle = (x, y) => {
 };
 
 const makeBouncyActorHere = (x, y, size) => {
-  const actorId = cast.addActor({
+  cast.addActor({
     onInit: function () {
+      this.destroyTime = Utils.getRandomInt(40) + 200;
       this
         .setPosition(x, y)
         .setAngle(Utils.getRandomInt(359))
-        .destroyIn(240);
+        .destroyIn(this.destroyTime);
+
     },
     onUpdate: function () {
 
-      let life = 240;
       this
         .tick()
-        .setSpeed(Tweens.easeOutCubic(this.time, 20, 0, life))
+        .setSpeed(Tweens.easeOutCubic(this.time, 20, 0, this.destroyTime))
         .setVector(Utils.vector(this.angle, this.speed))
         .checkShouldDestroy()
         .step();
 
       if (this.x >= config.width - size || this.x <= 0 + size) {
         this.angle = Utils.reflectDegrees(this.angle, 90);
+        audio.play('bounce');
       }
       if (this.y >= config.height - size || this.y <= 0 + size) {
         this.angle = Utils.reflectDegrees(this.angle, 0);
+        audio.play('bounce');
       }
 
-      let alpha = (this.speed / 100) * life;
+      let alpha = (this.speed / 100) * this.destroyTime;
       let rectangleColor = [1, 0.2, 0.1, alpha];
       let half = size / 2;
       stage.drawRectFill(rectangleColor, this.x - half, this.y - half, size, size);
     },
     onDestroy: function () {
+      audio.play('splode');
       Utils.times(Utils.getRandomInt(5) + 5)(i => {
         makeSmallParticle(this.x, this.y);
       });
