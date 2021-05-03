@@ -6,80 +6,76 @@ if (process.env.NODE_ENV === "development") {
 }
 
 const debug = document.getElementById('debug');
-
 const cast = new Cast();
 const audio = new Audio();
-audio.add('pew', '/sounds/pew.wav');
-audio.add('bounce', '/sounds/bounce.wav');
-audio.add('splode', '/sounds/splode.wav');
-
-const config = {
-  width: 800,
-  height: 480
-};
-
 const gamepad = new Gamepad();
-let joyPadFollower;
-gamepad.on('connect', e => {
-  console.log(`controller ${e.index} connected!`);
-  joyPadFollower = cast.addActor({
-    onInit: function () {
-      this.x = 300;
-      this.y = 300;
-    },
-    onUpdate: function () {
-      this.step();
-      let rectangleColor = [0.7, 0.7, 0.7, 1];
-      stage.drawRectFill(rectangleColor, this.x - 15, this.y - 15, 60, 30);
-      rectangleColor = [0.8, 0.8, 0.8, 1];
-      stage.drawRectFill(rectangleColor, this.x + 40, this.y, 30, 20);
-      rectangleColor = [0.6, 0.6, 0.6, 1];
-      stage.drawRectFill(rectangleColor, this.x - 10, this.y-25, 10, 50);
-
-    }
-  });
-});
-gamepad.on('disconnect', e => {
-  console.log(`controller ${e.index} disconnected!`);
-  if (joyPadFollower) {
-    cast.destroyActorById(joyPadFollower);
-    joyPadFollower = null;
-  };
-});
-gamepad.on('press', 'button_1', e => {
-  if (joyPadFollower) {
-    const { x, y } = cast.getActor(joyPadFollower);
-    makeShootyBullet(x, y);
-    audio.play('pew');
-  }
-});
-gamepad.on('hold', 'stick_axis_left', e => {
-  if (joyPadFollower) {
-    const ship = cast.getActor(joyPadFollower);
-    ship.setVector([e.value[0] * 5, e.value[1] * 5]);
-    makeBoosterParticle(ship.x - 10, ship.y);
-  }
-});
-gamepad.on('release', 'stick_axis_left', e => {
-  if (joyPadFollower) {
-    cast.getActor(joyPadFollower)
-      .stop();
-  }
-});
 
 const stage = new Stage({
   target: 'canvas',
-  width: config.width,
-  height: config.height,
-  onFrame: frame,
+  width: 800,
+  height: 480,
+  update: update,
+  init: init,
   onMouseClick: mouseClick,
   onMouseMove: mouseMove
 });
 
-function frame() {
+function init() {
+
+  audio.add('pew', '/sounds/pew.wav');
+  audio.add('bounce', '/sounds/bounce.wav');
+  audio.add('splode', '/sounds/splode.wav');
+
+  let joyPadFollower;
+  gamepad.on('connect', e => {
+    console.log(`controller ${e.index} connected!`);
+    joyPadFollower = cast.addActor({
+      onInit: function () {
+        this.setPosition(300, 300);
+      },
+      onUpdate: function () {
+        this.step();
+        let rectangleColor = [0.7, 0.7, 0.7, 1];
+        stage.drawRectFill(rectangleColor, this.x - 15, this.y - 15, 60, 30);
+        rectangleColor = [0.8, 0.8, 0.8, 1];
+        stage.drawRectFill(rectangleColor, this.x + 40, this.y, 30, 20);
+        rectangleColor = [0.6, 0.6, 0.6, 1];
+        stage.drawRectFill(rectangleColor, this.x - 10, this.y - 25, 10, 50);
+      }
+    });
+  });
+  gamepad.on('disconnect', e => {
+    console.log(`controller ${e.index} disconnected!`);
+    if (joyPadFollower) {
+      cast.destroyActorById(joyPadFollower);
+      joyPadFollower = null;
+    };
+  });
+  gamepad.on('press', 'button_1', e => {
+    if (joyPadFollower) {
+      const { x, y } = cast.getActor(joyPadFollower);
+      makeShootyBullet(x, y);
+      audio.play('pew');
+    }
+  });
+  gamepad.on('hold', 'stick_axis_left', e => {
+    if (joyPadFollower) {
+      const ship = cast.getActor(joyPadFollower);
+      ship.setVector([e.value[0] * 5, e.value[1] * 5]);
+      makeBoosterParticle(ship.x - 10, ship.y);
+    }
+  });
+  gamepad.on('release', 'stick_axis_left', e => {
+    if (joyPadFollower) {
+      cast.getActor(joyPadFollower)
+        .stop();
+    }
+  });
+}
+
+function update() {
   cast.updateActors();
   debug.innerHTML = JSON.stringify({
-    config,
     actors: Object.keys(cast.actors).length,
     audio: audio,
     gamepad: gamepad._events,
@@ -100,7 +96,7 @@ function mouseClick(event) {
 function mouseMove(event) {
 
   cast.getActor(mouseFollower)
-  .setPosition(event.x, event.y);
+    .setPosition(event.x, event.y);
 
   makeSmallParticle(event.x, event.y);
 }
@@ -151,7 +147,7 @@ const makeBoosterParticle = (x, y) => {
         .tick()
         .checkShouldDestroy()
         .step();
-      let rectangleColor = [Utils.getRandomInt(100)/100, Utils.getRandomInt(100)/100, 0.2, 0.3];
+      let rectangleColor = [Utils.getRandomInt(100) / 100, Utils.getRandomInt(100) / 100, 0.2, 0.3];
       let half = this.destroyTimer / 2;
       let size = Math.max(1, this.destroyTimer);
       stage.drawRectFill(rectangleColor, this.x - half, this.y - half, size, size);
@@ -203,11 +199,11 @@ const makeBouncyActorHere = (x, y, size) => {
         .checkShouldDestroy()
         .step();
 
-      if (this.x >= config.width - size || this.x <= 0 + size) {
+      if (this.x >= stage.width - size || this.x <= 0 + size) {
         this.angle = Utils.reflectDegrees(this.angle, 90);
         audio.play('bounce');
       }
-      if (this.y >= config.height - size || this.y <= 0 + size) {
+      if (this.y >= stage.height - size || this.y <= 0 + size) {
         this.angle = Utils.reflectDegrees(this.angle, 0);
         audio.play('bounce');
       }

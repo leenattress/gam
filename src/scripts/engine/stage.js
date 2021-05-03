@@ -1,6 +1,6 @@
 class Stage {
 
-  constructor({ target, width, height, onFrame, onMouseClick, onMouseMove }) {
+  constructor({ target, width, height, update, init, onMouseClick, onMouseMove }) {
 
     this.width = width;
     this.height = height;
@@ -32,7 +32,11 @@ class Stage {
     this.createShaders();
     this.aspect = this.canvas.width / this.canvas.height;
 
-    this.frame = onFrame;
+    this.frame = update;
+    if (typeof init === 'function') {
+      init();
+    }
+
     window.requestAnimationFrame((ts) => this.draw(ts));
   }
 
