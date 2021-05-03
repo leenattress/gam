@@ -55,7 +55,7 @@ When you run `npm run build` we use the [mini-css-extract-plugin](https://github
 - Input
   - ✅ Mouse
   - 🔲 Keyboard
-  - 🔲 Joypad
+  - ✅ Gamepad
   - 🔲 Mobile
 - Helpers
   - 🔲 Collisions

@@ -1,4 +1,4 @@
-import { Actor, Utils } from "./game";
+import { Actor, Utils } from ".";
 
 class Cast {
   constructor() {
@@ -39,7 +39,11 @@ class Cast {
   updateActors() {
     if (this.actors) {
       for (const [key, actor] of Object.entries(this.actors)) {
-        actor.update();
+        if (actor.destroyMe) {
+          this.destroyActor(this.actors[actor.key]);
+        } else {
+          actor.update();
+        }
       }
     }
   }

@@ -27,12 +27,23 @@ function degreesToRadians(degrees) {
 }
 
 function radiansToDegrees(radians) {
-  return radians * (180/Math.PI);
+  return radians * (180 / Math.PI);
 }
 
-function reflectDegrees(incidenceAngle, wallAngle) {       
-  return radiansToDegrees((2 * degreesToRadians(wallAngle)) - degreesToRadians(incidenceAngle));  
+function reflectDegrees(incidenceAngle, wallAngle) {
+  return radiansToDegrees((2 * degreesToRadians(wallAngle)) - degreesToRadians(incidenceAngle));
 }
+
+const repeat = n => f => x => {
+  if (n > 0)
+    return repeat(n - 1)(f)(f(x));
+  else
+    return x;
+};
+
+// times :: Int -> (Int -> Int) -> Int 
+const times = n => f =>
+  repeat(n)(i => (f(i), i + 1))(0);
 
 const Utils = {
   uuidv4,
@@ -44,7 +55,8 @@ const Utils = {
   vector,
   degreesToRadians,
   radiansToDegrees,
-  reflectDegrees
+  reflectDegrees,
+  times
 };
 
 export { Utils };

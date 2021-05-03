@@ -24,7 +24,6 @@ class Stage {
     }, false);
 
 
-
     this.gl = this.initGL();
     this.gl.enable(this.gl.BLEND);
     this.gl.blendFunc(this.gl.SRC_ALPHA, this.gl.ONE_MINUS_SRC_ALPHA);    
@@ -162,7 +161,7 @@ class Stage {
 
     // The loop function has reached it's end. Keep requesting new frames
     window.requestAnimationFrame((ts) => this.draw(ts));
-  }
+  }  
 
 }
 

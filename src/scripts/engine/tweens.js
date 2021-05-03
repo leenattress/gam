@@ -1,7 +1,7 @@
 'use strict';
 
 // t: current time, b: beginning value, _c: final value, d: total duration
-var tweens = {
+const Tweens = {
   linear: function(t, b, _c, d) {
     var c = _c - b;
     return c * t / d + b;
@@ -246,4 +246,4 @@ var tweens = {
   }
 };
 
-module.exports = tweens;
+export { Tweens };
