@@ -1,7 +1,7 @@
 
 # Untitled Game Engine
 
-An extremely simple game engine for the browser with an emphasis on retro games and simplicity.
+An extremely simple game engine for the browser with an emphasis on retro games and prototyping.
 
 
 ## Features
