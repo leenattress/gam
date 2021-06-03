@@ -1,0 +1,12 @@
+{
+  "name": "gam-examples",
+  "description": "",
+  "version": "0.1.0",
+  "scripts": {
+    "start": "serve"
+  },
+  "dependencies": {
+    "serve": "^11.3.2"
+  },
+  "devDependencies": {}
+}

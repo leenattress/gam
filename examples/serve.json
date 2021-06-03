@@ -1,0 +1,11 @@
+{
+  "directoryListing": false,
+  "unlisted": [
+    ".DS_Store",
+    ".git"
+  ],
+  "rewrites": [
+    { "source": "favicon.ico", "destination": "/common/favicon.ico" },
+    { "source": "style.css", "destination": "/common/style.css" }
+  ]
+}

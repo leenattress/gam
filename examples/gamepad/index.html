@@ -1,0 +1,149 @@
+<!doctype html>
+<html>
+
+<head lang='en'>
+  <meta charset='utf-8'>
+  <meta
+    name='viewport'
+    content='width=device-width'
+  >
+  <title>Gam example</title>
+  <link
+    rel="stylesheet"
+    href="/style.css"
+  >
+</head>
+
+<body>
+
+  <input
+    type="checkbox"
+    id="switch"
+    checked
+  >
+
+  <div class="container">
+    <canvas
+      id="canvas"
+      class="screen"
+    ></canvas>
+    <div class="overlay">GAMEPAD TEST</div>
+  </div>
+
+  <script type="module">
+
+    import { Game as G } from '../lib/gam.esm.js';
+
+    let joyPadFollower;
+
+    function init() {
+
+      G.audio.add('pew', 'pew.wav');    
+
+      G.gamepad.on('connect', e => {
+        console.log(`controller ${e.index} connected!`);
+        joyPadFollower = G.actors.addActor({
+          onInit: function () {
+            this
+              .setPosition(300, 300)
+              .setHitbox(0, 0, 60, 30);
+          },
+          onUpdate: function () {
+            this.step();
+            G.stage.rectFill(this.x - 15, this.y - 15, 60, 30, 20);
+            G.stage.rectFill(this.x + 40, this.y, 30, 20, 20);
+            G.stage.rectFill(this.x - 10, this.y - 25, 10, 50, 20);
+          }
+        });
+      });
+      G.gamepad.on('disconnect', e => {
+        console.log(`controller ${e.index} disconnected!`);
+        if (joyPadFollower) {
+          G.actors.destroyActorById(joyPadFollower);
+          joyPadFollower = null;
+        };
+      });
+      G.gamepad.on('press', 'button_1', e => {
+        if (joyPadFollower) {
+          const { x, y } = G.actors.getActor(joyPadFollower);
+          makeShootyBullet(x, y);
+          G.audio.play('pew');
+        }
+      });
+      G.gamepad.on('hold', 'stick_axis_left', e => {
+        if (joyPadFollower) {
+          const ship = G.actors.getActor(joyPadFollower);
+          ship.setVector([e.value[0] * 5, e.value[1] * 5]);
+          makeBoosterParticle(ship.x - 10, ship.y);
+        }
+      });
+      G.gamepad.on('release', 'stick_axis_left', e => {
+        if (joyPadFollower) {
+          G.actors.getActor(joyPadFollower)
+            .stop();
+        }
+      });
+
+    }
+
+    function update() {
+      G.actors.updateActors();
+    }
+
+
+    function makeShootyBullet(x, y) {
+      return G.actors.addActor({
+        onInit: function () {
+
+          this
+            .setPosition(x + 40, y)
+            .right(10)
+            .destroyIn(120);
+
+        },
+        onUpdate: function () {
+
+          this
+            .tick()
+            .checkShouldDestroy()
+            .step();
+
+          let size = 10;
+          let half = size / 2;
+          G.stage.rectFill(this.x - half, this.y - half, size, size, 27);
+        }
+      });
+    };
+
+
+    function makeBoosterParticle(x, y) {
+      return G.actors.addActor({
+        onInit: function () {
+          this
+            .setPosition(x, y + G.utils.getRandomInt(5))
+            .destroyIn(20);
+        },
+        onUpdate: function () {
+          this
+            .tick()
+            .checkShouldDestroy()
+            .step();
+          let rectangleColor = G.utils.getRandomInt(10) + 10;
+          let half = this.destroyTimer / 2;
+          let size = Math.max(1, this.destroyTimer);
+          G.stage.rectFill(this.x - half, this.y - half, size, size, rectangleColor);
+        }
+      });
+    };
+
+
+    G.powerOn({
+      target: 'canvas',
+      init,
+      update
+    });
+
+  </script>
+</body>
+
+</html>
