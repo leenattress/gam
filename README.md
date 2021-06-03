@@ -251,9 +251,14 @@ At this point the game engine does not support dithering or any sort of halftone
 
 We include a few helper functions under `Game.utils` to help with some frequently used game trigonometry.
 
-- `Game.utils.vector(angle, length)` - Given an `angle` in degrees, and a `length` return a vector `[n, n]`
-- `Game.utils.pointAngle(x1, y1, x2, y2)` - Given the `x` and `y` for 2 points, return the `angle`.
-- `Game.utils.pointDistance(x1, y1, x2, y2)` - Given the `x` and `y` for 2 points, return the `distance`.
-- `Game.utils.reflectDegrees(movementAngle, wallAngle)` - Given the `movementAngle` and the `wallAngle` return the reflection (bounce) `angle`
-- `Game.utils.getRandomInt(max)` - Gets an integer from `0` to `max`
+- `Game.utils.vector(angle, length)`
+  - Given an `angle` in degrees, and a `length` return a vector `[n, n]`
+- `Game.utils.pointAngle(x1, y1, x2, y2)`
+  - Given the `x` and `y` for 2 points, return the `angle`.
+- `Game.utils.pointDistance(x1, y1, x2, y2)`
+  - Given the `x` and `y` for 2 points, return the `distance`.
+- `Game.utils.reflectDegrees(movementAngle, wallAngle)`
+  - Given the `movementAngle` and the `wallAngle` return the reflection (bounce) `angle`
+- `Game.utils.getRandomInt(max)`
+  - Gets an integer from `0` to `max`
   
