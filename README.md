@@ -142,10 +142,10 @@ They have an extremely simple chaining API that makes them easy to use and under
 Inside the init, update and destroy functions, you can access `this` which contains the actor details.
 
 - `this.tick()` - Increments the internal timer for this actor
-- `this.setHitbox(X, y, width, height)` - Set the hitbox for later collision detetion
-- `this.setPosition(x, y)` - Set the position of the actor
-- `this.setAngle(angle)` - Set the rotational angle
-- `this.setSpeed(speed)` - Set the speed
+- `this.setHitbox(x, y, width, height)` - Set the hitbox for later collision detetion
+- `this.setPosition(x, y)` - Set the position of the actor, this can be a `float`
+- `this.setAngle(angle)` - Set the `vector` using degrees
+- `this.setSpeed(speed)` - Set the `speed` in pixels, this can be a `float`
 - `this.setVector(vector)` - Set the vector (direction). `vector` is an array of 2 numbers like `[1,1]`
 - `this.step()` - Move the actor in accordance with its vector 
 - `this.stop()` - Stop all movement 
@@ -255,4 +255,5 @@ We include a few helper functions under `Game.utils` to help with some frequentl
 - `Game.utils.pointAngle(x1, y1, x2, y2)` - Given the `x` and `y` for 2 points, return the `angle`.
 - `Game.utils.pointDistance(x1, y1, x2, y2)` - Given the `x` and `y` for 2 points, return the `distance`.
 - `Game.utils.reflectDegrees(movementAngle, wallAngle)` - Given the `movementAngle` and the `wallAngle` return the reflection (bounce) `angle`
+- `Game.utils.getRandomInt(max)` - Gets an integer from `0` to `max`
   
