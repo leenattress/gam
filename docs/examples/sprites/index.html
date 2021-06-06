@@ -95,12 +95,14 @@
       Game.stage.cls(PAL.WHITE)
 
       const bigSprite = Game.sprites.get('sonic3')
+      if (bigSprite) {
       Game.stage.zoneCopy(
             bigSprite.data,
             bigSprite.width,
             Game.stage.framebuffer,
             Game.stage.width,
-            0, 0, 0, 0, bigSprite.width, bigSprite.height);      
+            0, 0, 0, 0, bigSprite.width, bigSprite.height);  
+          }
 
       Game.actors.updateActors()
 
