@@ -570,8 +570,8 @@ class Stage {
 
   async getPixelData(img) {
 
-    //const canvas = document.createElement('canvas');
-    const canvas = document.getElementById('debug');
+    const canvas = document.createElement('canvas');
+    //const canvas = document.getElementById('debug');
     canvas.width = img.width;
     canvas.height = img.height;
     const context = canvas.getContext('2d');
