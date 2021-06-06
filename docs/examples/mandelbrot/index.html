@@ -85,7 +85,7 @@
               y / magnificationFactor - panY);
 
           // set a pixel in the game framebuffer    
-          Game.stage.pset(Math.min(belongsToSet, 31), x, y);
+          Game.stage.pset(Math.min(belongsToSet, 31), Math.floor(x), Math.floor(y));
 
         }
       }
