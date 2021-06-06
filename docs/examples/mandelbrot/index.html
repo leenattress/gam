@@ -32,7 +32,11 @@
 
   <script type="module">
 
-    import { Game } from '../lib/gam.esm.js';
+    import { Game, PAL } from '../lib/gam.esm.js';
+
+    let brotzoom = 1
+    let brotPanX = 0.88
+    let brotPanY = 0.78
 
     // Quick Mandelbrot calc function
     function checkIfBelongsToMandelbrotSet(x, y) {
@@ -55,25 +59,15 @@
       return 0;   // Return zero if in set        
     }
 
-    const init = () => {
-
-      Game.state = {
-        brotzoom: 1,
-        brotPanX: 0.88,
-        brotPanY: 0.78
-      }
-
-    }
-
     const update = () => {
 
-      Game.state.brotzoom += 1;
-      Game.state.brotPanX -= 0.000102;
-      Game.state.brotPanY -= 0.000102;
+      brotzoom += 1;
+      brotPanX -= 0.000102;
+      brotPanY -= 0.000102;
 
-      var magnificationFactor = Game.state.brotzoom;
-      var panX = Game.state.brotPanX;
-      var panY = Game.state.brotPanY;
+      var magnificationFactor = brotzoom;
+      var panX = brotPanX;
+      var panY = brotPanY;
 
       // Game.stage.width and Game.stage.height contain the screen sizes
       for (var x = 0; x < Game.stage.width; x++) {
@@ -84,8 +78,14 @@
             checkIfBelongsToMandelbrotSet(x / magnificationFactor - panX,
               y / magnificationFactor - panY);
 
-          // set a pixel in the game framebuffer    
-          Game.stage.pset(Math.min(belongsToSet, 31), Math.floor(x), Math.floor(y));
+            // set a pixel in the game framebuffer if its in the set  
+            Game.stage.pset(
+              Math.floor(
+                Math.min(belongsToSet, 31)
+              ),
+              x,
+              y
+            );
 
         }
       }
@@ -94,8 +94,7 @@
 
     Game.powerOn({
       target: 'canvas',
-      update,
-      init
+      update
     })
 
   </script>

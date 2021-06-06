@@ -55,6 +55,30 @@ const memoryToXy = (memory, width) => {
   y = memory / width;    // where "/" is an integer division
 }
 
+function splice2(index, howmany) {
+  if (index < 0) {
+    index = this.length + index;
+  };
+  if (!howmany || howmany < 0) {
+    howmany = 0;
+  };
+  var selection = this.slice(index, index + howmany);
+  copyFrom2(
+    this.slice(0, index)
+      .concat(Array.prototype.slice.apply(arguments, [2]))
+      .concat(this.slice(index + howmany)));
+  return selection;
+};
+
+function copyFrom2(source) {
+  for (var i = 0; i < source.length; i++) {
+    this[i] = source[i];
+  };
+  this.length = source.length;
+  return this;
+};
+
+
 const Utils = {
   uuidv4,
   getRandomInt,
@@ -68,7 +92,8 @@ const Utils = {
   reflectDegrees,
   times,
   xyToMemory,
-  memoryToXy
+  memoryToXy,
+  splice2 // Electric Boogaloo
 };
 
 export { Utils };

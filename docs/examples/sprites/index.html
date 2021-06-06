@@ -10,7 +10,7 @@
   <title>Gam example</title>
   <link
     rel="stylesheet"
-    href="/gam/style.css"
+    href="../../style.css"
   >
 </head>
 
@@ -36,93 +36,35 @@
   <script type="module">
 
     // Insert our game cartridge
-    import { Game, TV, PAL } from '../lib/gam.esm.js';
+    import { Game as G, PAL } from '../lib/gam.esm.js';
 
-
-    const makeBouncyActorHere = (x, y, size) => {
-      Game.actors.addActor({
-        onInit: function () {
-
-          this.destroyTime = Game.utils.getRandomInt(40) + 200;
-          this
-            .setPosition(x, y)
-            .setAngle(Game.utils.getRandomInt(359))
-            .destroyIn(this.destroyTime);
-
-        },
-        onUpdate: function () {
-
-          this
-            .tick()
-            .setSpeed(Game.tweens.easeOutCubic(this.time, 5, 0, this.destroyTime))
-            .setVector(Game.utils.vector(this.angle, this.speed))
-            .checkShouldDestroy()
-            .step();
-
-          if (this.x >= Game.stage.width - size || this.x <= 0 + size) {
-            this.angle = Game.utils.reflectDegrees(this.angle, 90);
-          }
-          if (this.y >= Game.stage.height - size || this.y <= 0 + size) {
-            this.angle = Game.utils.reflectDegrees(this.angle, 0);
-          }
-
-          let half = (size / 2) << 0;
-          const bigSprite = Game.sprites.get('sonic2')
-
-          // stage.rectFill(this.x - half, this.y - half, size, size, 18);
-          Game.stage.zoneCopy(
-            bigSprite.data,
-            bigSprite.width,
-            Game.stage.framebuffer,
-            Game.stage.width,
-            this.x - half, this.y - half, this.x - half, this.y - half, size, size);
-        },
-        onDestroy: function () {
-        },
-      });
-    };
-
-    // ROM data
+    // Load sprites in the init function
     async function init() {
-      await Game.sprites.add('test', 'full-screen-db32.png');
-      await Game.sprites.add('sonic', 'sonic.png');
-      await Game.sprites.add('sonic2', 'sonic2.png');
-      await Game.sprites.add('sonic3', 'sonic3.png');
-      await Game.sprites.add('sonic-waterfall', 'sonic-waterfall.png');
+      await G.stage.addSprite('sonic', 'sonic.png');
+      await G.stage.addSprite('sonic2', 'sonic2.png');
+      await G.stage.addSprite('sonic3', 'sonic3.png');
+      await G.stage.addSprite('sonic-waterfall', 'sonic-waterfall.png');
     }
+
+    // update runs at 60fps
     function update() {
 
-      Game.stage.cls(PAL.WHITE)
+      // clear the stage
+      G.stage.cls(PAL.BLACK)
 
-      const bigSprite = Game.sprites.get('sonic3')
-      if (bigSprite) {
-      Game.stage.zoneCopy(
-            bigSprite.data,
-            bigSprite.width,
-            Game.stage.framebuffer,
-            Game.stage.width,
-            0, 0, 0, 0, bigSprite.width, bigSprite.height);  
-          }
-
-      Game.actors.updateActors()
-
-    }
-    function mouseClick(event) {
-      
-      makeBouncyActorHere(event.x, event.y, 32);
-
-    }
-    function mouseMove(event) {
-      // Called when the mouse moves
+      // display a grid of cropped sprites
+      G.stage.drawSprite('sonic', 8, 8, { width: 128-16, height: 96-16, offsetX: 64, offsetY: 64 })
+      G.stage.drawSprite('sonic2', 128, 8, { width: 128-16, height: 96-16, offsetX: 64, offsetY: 64 })
+      G.stage.drawSprite('sonic3', 8, 96, { width: 128-16, height: 96-16, offsetX: 64, offsetY: 64 })
+      G.stage.drawSprite('sonic-waterfall', 128, 96, { width: 128-16, height: 96-16, offsetX: 64, offsetY: 64 })
+    
     }
 
     // Turn the console on
-    Game.powerOn({
+    G.powerOn({
       target: 'canvas',
       init,
-      update,
-      mouseClick,
-      mouseMove
+      update
     });
 
   </script>

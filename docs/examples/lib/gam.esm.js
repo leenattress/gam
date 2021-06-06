@@ -152,6 +152,25 @@ const memoryToXy = (memory, width) => {
   y = memory / width;    // where "/" is an integer division
 };
 
+function splice2(index, howmany) {
+  if (index < 0) {
+    index = this.length + index;
+  }  if (!howmany || howmany < 0) {
+    howmany = 0;
+  }  var selection = this.slice(index, index + howmany);
+  copyFrom2(
+    this.slice(0, index)
+      .concat(Array.prototype.slice.apply(arguments, [2]))
+      .concat(this.slice(index + howmany)));
+  return selection;
+}
+function copyFrom2(source) {
+  for (var i = 0; i < source.length; i++) {
+    this[i] = source[i];
+  }  this.length = source.length;
+  return this;
+}
+
 const Utils = {
   uuidv4,
   getRandomInt,
@@ -165,7 +184,8 @@ const Utils = {
   reflectDegrees,
   times,
   xyToMemory,
-  memoryToXy
+  memoryToXy,
+  splice2 // Electric Boogaloo
 };
 
 class Actor {
@@ -402,7 +422,7 @@ class Stage {
     //   init();
     // }
 
-    this.sprites = [];
+    this.sprites = {};
 
     this.fpsInterval = 1000 / (this.refreshRate || 60);
     this.then = Date.now();
@@ -486,12 +506,6 @@ class Stage {
 
   }
 
-  // getVertex(x, y) {
-  //   const x_ndc = (2 * (x + 0.5) / this.width - 1);
-  //   const y_ndc = (2 * (y + 0.5) / this.height - 1);
-  //   return [x_ndc, y_ndc];
-  // }
-
   zoneCopy(source, sourcewidth, destination, destwidth, sx, sy, dx, dy, w, h) {
 
     let cloneSource = [...source];
@@ -514,6 +528,117 @@ class Stage {
       sourceAddress += sourcewidth;
       destAddress += destwidth;
     }
+  }
+
+
+  /*
+  🧚‍♀️ Sprites
+  */
+
+  async getImageData(imageUrl) {
+    let img;
+    const imageLoadPromise = new Promise(resolve => {
+      img = new Image();
+      img.onload = resolve;
+      img.src = imageUrl;
+    });
+
+    await imageLoadPromise;
+    return img;
+  }
+
+  // return nearest color from array
+  nearestColor(palleteRGB, colorRGB) {
+    var lowest = Number.POSITIVE_INFINITY;
+    var tmp;
+    let index = 0;
+    palleteRGB.forEach((el, i) => {
+      tmp = this.distance(colorRGB, el);
+      if (tmp < lowest) {
+        lowest = tmp;
+        index = i;
+      }    });
+    return index;
+  }
+  distance(a, b) {
+    return Math.sqrt(Math.pow(a[0] - b[0], 2) + Math.pow(a[1] - b[1], 2) + Math.pow(a[2] - b[2], 2));
+  }
+
+  async getPixelData(img) {
+
+    //const canvas = document.createElement('canvas');
+    const canvas = document.getElementById('debug');
+    canvas.width = img.width;
+    canvas.height = img.height;
+    const context = canvas.getContext('2d');
+    context.drawImage(img, 0, 0);
+    const imageData = context.getImageData(0, 0, img.width, img.height).data;
+    console.log(imageData);
+    let imageRgbData = [];
+    for (var i = 0; i < imageData.length; i += 4) {
+      const rgbPixel = [
+        imageData[i] = imageData[i] / 255,     // red
+        imageData[i + 1] = imageData[i + 1] / 255, // green
+        imageData[i + 2] = imageData[i + 2] / 255, // blue
+        imageData[i + 3] = 1 // no transparent
+      ];
+
+      imageRgbData.push(this.nearestColor(rgbpal, rgbPixel));
+    }
+    return {
+      data: imageRgbData,
+      width: img.width,
+      height: img.height
+    };
+  }
+
+  async loadPng(src) {
+
+    // load image
+    const imageObj = await this.getImageData(src);
+
+    // get pixel data
+    const imageData = await this.getPixelData(imageObj);
+
+    return imageData;
+  }
+  async addSprite(name, path) {
+    this.sprites[name] = await this.loadPng(path);
+    console.log('🎨', this.getSprite(name));
+  }
+  getSprite(name) { return this.sprites[name]; }
+
+  drawSprite(name, x, y, {
+    width,
+    height,
+    offsetX,
+    offsetY,
+    transparentColor,
+    flipH,
+    flipV
+  }) {
+
+    if (name) {
+
+      const bigSprite = this.getSprite(name);
+
+      if (bigSprite) {
+        this.zoneCopy(
+          bigSprite.data,
+          bigSprite.width,
+          this.framebuffer,
+          this.width,
+          offsetX,
+          offsetY,
+          x,
+          y,
+          width,
+          height
+        );
+      }
+
+    }
+
   }
 
   fastInt(float) {
@@ -559,10 +684,12 @@ class Stage {
         if (colour === 0 || colour > 0) {
           fragCol = this.rgbpal[colour];
 
-          var k = index * 5;
-          this.framebufferInternal[k + 2] = fragCol[0]; // r
-          this.framebufferInternal[k + 3] = fragCol[1]; // g
-          this.framebufferInternal[k + 4] = fragCol[2]; // b     
+          if (fragCol) {
+            var k = index * 5;
+            this.framebufferInternal[k + 2] = fragCol[0]; // r
+            this.framebufferInternal[k + 3] = fragCol[1]; // g
+            this.framebufferInternal[k + 4] = fragCol[2]; // b
+          }
         }
 
         index += 1;
