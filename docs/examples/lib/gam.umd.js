@@ -622,11 +622,14 @@ void main() {
       transparentColor,
       flipH,
       flipV
-    }) {
+    } = {}) {
 
       if (name) {
 
         const bigSprite = this.getSprite(name);
+
+        const sprWidth = width || bigSprite.width;
+        const sprHeight = height || bigSprite.height;
 
         if (bigSprite) {
           this.zoneCopy(
@@ -638,8 +641,8 @@ void main() {
             offsetY,
             x,
             y,
-            width,
-            height
+            sprWidth,
+            sprHeight
           );
         }
 

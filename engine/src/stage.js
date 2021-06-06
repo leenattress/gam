@@ -248,11 +248,14 @@ class Stage {
     transparentColor,
     flipH,
     flipV
-  }) {
+  } = {}) {
 
     if (name) {
 
       const bigSprite = this.getSprite(name)
+
+      const sprWidth = width || bigSprite.width
+      const sprHeight = height || bigSprite.height
 
       if (bigSprite) {
         this.zoneCopy(
@@ -264,8 +267,8 @@ class Stage {
           offsetY,
           x,
           y,
-          width,
-          height
+          sprWidth,
+          sprHeight
         );
       }
 

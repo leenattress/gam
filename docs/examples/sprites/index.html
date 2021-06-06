@@ -31,8 +31,6 @@
     <div class="vignette"></div>
   </div>
 
-  <canvas id="debug"></canvas>
-
   <script type="module">
 
     // Insert our game cartridge
@@ -51,6 +49,9 @@
 
       // clear the stage
       G.stage.cls(PAL.BLACK)
+
+      // draw a full 'screen' sprite
+      G.stage.drawSprite('sonic2', 0, 0)
 
       // display a grid of cropped sprites
       G.stage.drawSprite('sonic', 8, 8, { width: 128-16, height: 96-16, offsetX: 64, offsetY: 64 })
