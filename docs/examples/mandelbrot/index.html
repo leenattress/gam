@@ -1,0 +1,104 @@
+<!doctype html>
+<html>
+
+<head lang='en'>
+  <meta charset='utf-8'>
+  <meta
+    name='viewport'
+    content='width=device-width'
+  >
+  <title>Gam example</title>
+  <link
+    rel="stylesheet"
+    href="/style.css"
+  >
+</head>
+
+<body>
+
+  <input
+    type="checkbox"
+    id="switch"
+    checked
+  >
+
+  <div class="container">
+    <canvas
+      id="canvas"
+      class="screen"
+    ></canvas>
+    <div class="overlay">UGLY MANDELBROT</div>
+  </div>
+
+  <script type="module">
+
+    import { Game } from '../lib/gam.esm.js';
+
+    // Quick Mandelbrot calc function
+    function checkIfBelongsToMandelbrotSet(x, y) {
+      var realComponent = x;
+      var imaginaryComponent = y;
+      var maxIterations = 50;
+      for (var i = 0; i < maxIterations; i++) {
+        var tempRealComponent = realComponent * realComponent
+          - imaginaryComponent * imaginaryComponent
+          + x;
+        var tempImaginaryComponent = 2 * realComponent * imaginaryComponent
+          + y;
+        realComponent = tempRealComponent;
+        imaginaryComponent = tempImaginaryComponent;
+
+        // Return a number as a percentage
+        if (realComponent * imaginaryComponent > 5)
+          return (i / maxIterations * 100);
+      }
+      return 0;   // Return zero if in set        
+    }
+
+    const init = () => {
+
+      Game.state = {
+        brotzoom: 1,
+        brotPanX: 0.88,
+        brotPanY: 0.78
+      }
+
+    }
+
+    const update = () => {
+
+      Game.state.brotzoom += 1;
+      Game.state.brotPanX -= 0.000102;
+      Game.state.brotPanY -= 0.000102;
+
+      var magnificationFactor = Game.state.brotzoom;
+      var panX = Game.state.brotPanX;
+      var panY = Game.state.brotPanY;
+
+      // Game.stage.width and Game.stage.height contain the screen sizes
+      for (var x = 0; x < Game.stage.width; x++) {
+        for (var y = 0; y < Game.stage.height; y++) {
+
+          // Mandelbrot set calculation
+          var belongsToSet =
+            checkIfBelongsToMandelbrotSet(x / magnificationFactor - panX,
+              y / magnificationFactor - panY);
+
+          // set a pixel in the game framebuffer    
+          Game.stage.pset(Math.min(belongsToSet, 31), x, y);
+
+        }
+      }
+
+    }
+
+    Game.powerOn({
+      target: 'canvas',
+      update,
+      init
+    })
+
+  </script>
+</body>
+
+</html>

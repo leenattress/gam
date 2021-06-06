@@ -190,7 +190,6 @@ class Actor {
     this.angle = 0;
     this.speed = 0;
     this.active = true;
-    this.alpha = 1;
 
     this.destroyAuto = false;
     this.destroyTimer = 0;
@@ -491,6 +490,12 @@ class Stage {
 
   }
 
+  // getVertex(x, y) {
+  //   const x_ndc = (2 * (x + 0.5) / this.width - 1);
+  //   const y_ndc = (2 * (y + 0.5) / this.height - 1);
+  //   return [x_ndc, y_ndc];
+  // }
+
   zoneCopy(source, sourcewidth, destination, destwidth, sx, sy, dx, dy, w, h) {
 
     let cloneSource = [...source];
@@ -505,7 +510,9 @@ class Stage {
     let destAddress = Utils.xyToMemory(this.fastInt(dx), this.fastInt(dy), destwidth);
     let scanlineData = [];
 
-    for (let i = 0; i < h; i++) {    
+    for (let i = 0; i < h; i++) {
+      // cloneSource = [...source];
+      // cloneDest = [...destination];      
       scanlineData = cloneSource.slice(sourceAddress, sourceAddress + w);
       this.framebuffer.splice(destAddress, w, ...scanlineData);
       sourceAddress += sourcewidth;

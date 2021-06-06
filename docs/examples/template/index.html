@@ -1,0 +1,64 @@
+<!doctype html>
+<html>
+
+<head lang='en'>
+  <meta charset='utf-8'>
+  <meta
+    name='viewport'
+    content='width=device-width'
+  >
+  <title>Gam example</title>
+  <link
+    rel="stylesheet"
+    href="/style.css"
+  >
+</head>
+
+<body>
+
+  <input
+    type="checkbox"
+    id="switch"
+    checked
+  >
+
+  <div class="container">
+    <canvas
+      id="canvas"
+      class="screen"
+    ></canvas>
+    <div class="overlay">GAM TEMPLATE</div>
+  </div>
+
+  <script type="module">
+
+    // Insert our game cartridge
+    import { Game } from '../lib/gam.esm.js';
+
+    // ROM data
+    function init() {
+      // Called when the game starts
+    }
+    function update() {
+      // Called every frame
+    }
+    function mouseClick(event) {
+      // Called when the mouse is clicked
+    }
+    function mouseMove(event) {
+      // Called when the mouse moves
+    }
+
+    // Turn the console on
+    Game.powerOn({
+      target: 'canvas',
+      init,
+      update,
+      mouseClick,
+      mouseMove
+    });
+
+  </script>
+</body>
+
+</html>

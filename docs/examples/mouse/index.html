@@ -1,0 +1,83 @@
+<!doctype html>
+<html>
+
+<head lang='en'>
+  <meta charset='utf-8'>
+  <meta
+    name='viewport'
+    content='width=device-width'
+  >
+  <title>Gam example</title>
+  <link
+    rel="stylesheet"
+    href="/style.css"
+  >
+</head>
+
+<body>
+
+  <input
+    type="checkbox"
+    id="switch"
+    checked
+  >
+
+  <div class="container">
+    <canvas
+      id="canvas"
+      class="screen"
+    ></canvas>
+    <div class="overlay">MOUSE FOLLOWER</div>
+  </div>
+
+  <script type="module">
+
+    import { Game, PAL } from '../lib/gam.esm.js';
+
+    let mouseFollower;
+
+    function init() {
+
+      mouseFollower = Game.actors.addActor({
+        onInit: function () {
+          this
+            .setPosition(200, 200)
+            .setHitbox(0, 0, 30, 30);
+        },
+        onUpdate: function () {
+          Game.stage.pset(PAL.WHITE, this.x -10, this.y - 10)
+          Game.stage.rectFill(PAL.RED, 100, 25, 100, 50)
+
+          //Game.stage.rectFill(this.x - 15, this.y - 15, 30, 30, 27);
+        }
+      });
+
+    }
+
+    function update() {
+      Game.actors.updateActors();
+    }
+
+    function mouseClick(event) {
+      console.log('🐭 Mouse clicked', event)
+    }
+
+    function mouseMove(event) {
+      const moveFollower = Game.actors.getActor(mouseFollower);
+      if (moveFollower) {
+        moveFollower.setPosition(event.x, event.y);
+      }
+    }
+
+    Game.powerOn({
+      target: 'canvas',
+      init,
+      update,
+      mouseClick: mouseClick,
+      mouseMove: mouseMove
+    });
+
+  </script>
+</body>
+
+</html>

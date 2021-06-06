@@ -186,7 +186,6 @@ class Actor {
     this.angle = 0;
     this.speed = 0;
     this.active = true;
-    this.alpha = 1;
 
     this.destroyAuto = false;
     this.destroyTimer = 0;

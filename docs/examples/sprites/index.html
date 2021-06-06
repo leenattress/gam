@@ -1,0 +1,129 @@
+<!doctype html>
+<html>
+
+<head lang='en'>
+  <meta charset='utf-8'>
+  <meta
+    name='viewport'
+    content='width=device-width'
+  >
+  <title>Gam example</title>
+  <link
+    rel="stylesheet"
+    href="/style.css"
+  >
+</head>
+
+<body>
+
+  <input
+    type="checkbox"
+    id="switch"
+    checked
+  >
+
+  <div class="container">
+    <canvas
+      id="canvas"
+      class="screen"
+    ></canvas>
+    <div class="overlay"><span class="crt-colorsep">SPRITES</span></div>
+    <div class="vignette"></div>
+  </div>
+
+  <canvas id="debug"></canvas>
+
+  <script type="module">
+
+    // Insert our game cartridge
+    import { Game, TV, PAL } from '../lib/gam.esm.js';
+
+
+    const makeBouncyActorHere = (x, y, size) => {
+      Game.actors.addActor({
+        onInit: function () {
+
+          this.destroyTime = Game.utils.getRandomInt(40) + 200;
+          this
+            .setPosition(x, y)
+            .setAngle(Game.utils.getRandomInt(359))
+            .destroyIn(this.destroyTime);
+
+        },
+        onUpdate: function () {
+
+          this
+            .tick()
+            .setSpeed(Game.tweens.easeOutCubic(this.time, 5, 0, this.destroyTime))
+            .setVector(Game.utils.vector(this.angle, this.speed))
+            .checkShouldDestroy()
+            .step();
+
+          if (this.x >= Game.stage.width - size || this.x <= 0 + size) {
+            this.angle = Game.utils.reflectDegrees(this.angle, 90);
+          }
+          if (this.y >= Game.stage.height - size || this.y <= 0 + size) {
+            this.angle = Game.utils.reflectDegrees(this.angle, 0);
+          }
+
+          let half = (size / 2) << 0;
+          const bigSprite = Game.sprites.get('sonic2')
+
+          // stage.rectFill(this.x - half, this.y - half, size, size, 18);
+          Game.stage.zoneCopy(
+            bigSprite.data,
+            bigSprite.width,
+            Game.stage.framebuffer,
+            Game.stage.width,
+            this.x - half, this.y - half, this.x - half, this.y - half, size, size);
+        },
+        onDestroy: function () {
+        },
+      });
+    };
+
+    // ROM data
+    async function init() {
+      await Game.sprites.add('test', '/sprites/full-screen-db32.png');
+      await Game.sprites.add('sonic', '/sprites/sonic.png');
+      await Game.sprites.add('sonic2', '/sprites/sonic2.png');
+      await Game.sprites.add('sonic3', '/sprites/sonic3.png');
+      await Game.sprites.add('sonic-waterfall', '/sprites/sonic-waterfall.png');
+    }
+    function update() {
+
+      Game.stage.cls(PAL.WHITE)
+
+      const bigSprite = Game.sprites.get('sonic3')
+      Game.stage.zoneCopy(
+            bigSprite.data,
+            bigSprite.width,
+            Game.stage.framebuffer,
+            Game.stage.width,
+            0, 0, 0, 0, bigSprite.width, bigSprite.height);      
+
+      Game.actors.updateActors()
+
+    }
+    function mouseClick(event) {
+      
+      makeBouncyActorHere(event.x, event.y, 32);
+
+    }
+    function mouseMove(event) {
+      // Called when the mouse moves
+    }
+
+    // Turn the console on
+    Game.powerOn({
+      target: 'canvas',
+      init,
+      update,
+      mouseClick,
+      mouseMove
+    });
+
+  </script>
+</body>
+
+</html>
